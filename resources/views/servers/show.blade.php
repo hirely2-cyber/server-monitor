@@ -464,52 +464,83 @@ cat > $SCRIPT_PATH << 'EOF'
 API_URL="__API_URL__"
 API_TOKEN="__API_TOKEN__"
 
-# Get CPU usage
-CPU_USAGE=$(top -bn1 | grep "Cpu(s)" | sed "s/.*, *\([0-9.]*\)%* id.*/\1/" | awk '{print 100 - $1}')
+# Get CPU usage with fallback
+CPU_USAGE=$(top -bn1 | grep "Cpu(s)" | sed "s/.*, *\([0-9.]*\)%* id.*/\1/" | awk '{print 100 - $1}' 2>/dev/null)
+[ -z "$CPU_USAGE" ] || [ "$CPU_USAGE" = "100" ] && CPU_USAGE=0
 
-# Get Memory usage
-MEM_INFO=$(free -m | awk 'NR==2{printf "%.2f %.0f %.0f", $3*100/$2, $2, $3 }')
-MEM_USAGE=$(echo $MEM_INFO | awk '{print $1}')
-MEM_TOTAL=$(echo $MEM_INFO | awk '{print $2}')
-MEM_USED=$(echo $MEM_INFO | awk '{print $3}')
+# Get Memory usage with fallback
+MEM_INFO=$(free -m | awk 'NR==2{printf "%.2f %.0f %.0f", $3*100/$2, $2, $3 }' 2>/dev/null)
+if [ -n "$MEM_INFO" ]; then
+    MEM_USAGE=$(echo $MEM_INFO | awk '{print $1}')
+    MEM_TOTAL=$(echo $MEM_INFO | awk '{print $2}')
+    MEM_USED=$(echo $MEM_INFO | awk '{print $3}')
+else
+    MEM_USAGE=0
+    MEM_TOTAL=0
+    MEM_USED=0
+fi
 
-# Get Disk usage
-DISK_INFO=$(df -h / | awk 'NR==2{printf "%.2f %.0f %.0f", substr($5,1,length($5)-1), $2, $3}')
-DISK_USAGE=$(echo $DISK_INFO | awk '{print $1}')
-DISK_TOTAL=$(echo $DISK_INFO | awk '{print $2}')
-DISK_USED=$(echo $DISK_INFO | awk '{print $3}')
+# Get Disk usage with fallback
+DISK_INFO=$(df / | awk 'NR==2{printf "%.2f", substr($5,1,length($5)-1)}' 2>/dev/null)
+if [ -n "$DISK_INFO" ]; then
+    DISK_USAGE=$DISK_INFO
+    DISK_TOTAL=$(df -BG / | awk 'NR==2{print substr($2,1,length($2)-1)}')
+    DISK_USED=$(df -BG / | awk 'NR==2{print substr($3,1,length($3)-1)}')
+else
+    DISK_USAGE=0
+    DISK_TOTAL=0
+    DISK_USED=0
+fi
 
-# Get Network usage (KB/s)
-RX1=$(cat /sys/class/net/eth0/statistics/rx_bytes 2>/dev/null || echo 0)
-TX1=$(cat /sys/class/net/eth0/statistics/tx_bytes 2>/dev/null || echo 0)
-sleep 1
-RX2=$(cat /sys/class/net/eth0/statistics/rx_bytes 2>/dev/null || echo 0)
-TX2=$(cat /sys/class/net/eth0/statistics/tx_bytes 2>/dev/null || echo 0)
-NETWORK_IN=$(echo "scale=2; ($RX2 - $RX1) / 1024" | bc)
-NETWORK_OUT=$(echo "scale=2; ($TX2 - $TX1) / 1024" | bc)
+# Detect network interface (try common ones)
+NET_IFACE="eth0"
+[ ! -d "/sys/class/net/$NET_IFACE" ] && NET_IFACE="ens3"
+[ ! -d "/sys/class/net/$NET_IFACE" ] && NET_IFACE="ens18"
+[ ! -d "/sys/class/net/$NET_IFACE" ] && NET_IFACE="enp0s3"
+
+# Get Network usage with fallback
+if [ -d "/sys/class/net/$NET_IFACE" ]; then
+    RX1=$(cat /sys/class/net/$NET_IFACE/statistics/rx_bytes 2>/dev/null || echo 0)
+    TX1=$(cat /sys/class/net/$NET_IFACE/statistics/tx_bytes 2>/dev/null || echo 0)
+    sleep 1
+    RX2=$(cat /sys/class/net/$NET_IFACE/statistics/rx_bytes 2>/dev/null || echo 0)
+    TX2=$(cat /sys/class/net/$NET_IFACE/statistics/tx_bytes 2>/dev/null || echo 0)
+    NETWORK_IN=$(awk "BEGIN {printf \"%.2f\", ($RX2 - $RX1) / 1024}" 2>/dev/null)
+    NETWORK_OUT=$(awk "BEGIN {printf \"%.2f\", ($TX2 - $TX1) / 1024}" 2>/dev/null)
+else
+    NETWORK_IN=0
+    NETWORK_OUT=0
+fi
 
 # Get Load Average
-LOAD_AVG=$(uptime | awk -F'load average:' '{print $2}' | xargs)
+LOAD_AVG=$(uptime | awk -F'load average:' '{print $2}' | xargs 2>/dev/null)
+[ -z "$LOAD_AVG" ] && LOAD_AVG="0, 0, 0"
 
 # Get Uptime (seconds)
-UPTIME=$(cat /proc/uptime | awk '{print int($1)}')
+UPTIME=$(cat /proc/uptime | awk '{print int($1)}' 2>/dev/null)
+[ -z "$UPTIME" ] && UPTIME=0
+
+# Validate values before sending (don't send if all are 0 or empty)
+if [ -z "$CPU_USAGE" ] && [ -z "$MEM_USAGE" ] && [ -z "$DISK_USAGE" ]; then
+    exit 0
+fi
 
 # Send to API
 curl -X POST "$API_URL" \
   -H "Authorization: Bearer $API_TOKEN" \
   -H "Content-Type: application/json" \
   -d "{
-    \"cpu_usage\": $CPU_USAGE,
-    \"memory_usage\": $MEM_USAGE,
-    \"memory_total\": $MEM_TOTAL,
-    \"memory_used\": $MEM_USED,
-    \"disk_usage\": $DISK_USAGE,
-    \"disk_total\": $DISK_TOTAL,
-    \"disk_used\": $DISK_USED,
-    \"network_in\": $NETWORK_IN,
-    \"network_out\": $NETWORK_OUT,
+    \"cpu_usage\": ${CPU_USAGE:-0},
+    \"memory_usage\": ${MEM_USAGE:-0},
+    \"memory_total\": ${MEM_TOTAL:-0},
+    \"memory_used\": ${MEM_USED:-0},
+    \"disk_usage\": ${DISK_USAGE:-0},
+    \"disk_total\": ${DISK_TOTAL:-0},
+    \"disk_used\": ${DISK_USED:-0},
+    \"network_in\": ${NETWORK_IN:-0},
+    \"network_out\": ${NETWORK_OUT:-0},
     \"load_average\": \"$LOAD_AVG\",
-    \"uptime\": $UPTIME
+    \"uptime\": ${UPTIME:-0}
   }" \
   -s > /dev/null
 
