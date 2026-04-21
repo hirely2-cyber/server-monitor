@@ -1,0 +1,145 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Prevent Alpine x-cloak flicker */
+[x-cloak] { display: none !important; }
+
+/* ============================================================
+   CSS Custom Properties — Light & Dark Tokens
+   ============================================================ */
+@layer base {
+    :root {
+        --color-bg:          #f3f4f6;   /* gray-100 */
+        --color-surface:     #ffffff;
+        --color-surface-2:   #f9fafb;   /* gray-50 */
+        --color-border:      #e5e7eb;   /* gray-200 */
+        --color-text:        #111827;   /* gray-900 */
+        --color-text-muted:  #6b7280;   /* gray-500 */
+        --color-primary:     #4f46e5;   /* indigo-600 */
+        --color-primary-h:   #4338ca;   /* indigo-700 */
+    }
+
+    .dark {
+        --color-bg:          #111111;   /* charcoal black */
+        --color-surface:     #1c1c1c;   /* card/panel bg */
+        --color-surface-2:   #242424;   /* input / nested bg */
+        --color-border:      #333333;   /* borders */
+        --color-text:        #f0f0f0;   /* primary text */
+        --color-text-muted:  #888888;   /* muted text */
+        --color-primary:     #6366f1;   /* indigo-500 */
+        --color-primary-h:   #818cf8;   /* indigo-400 */
+    }
+
+    /* Smooth theme transitions */
+    html {
+        @apply transition-colors duration-200;
+    }
+
+    body {
+        background-color: var(--color-bg);
+        color: var(--color-text);
+        @apply transition-colors duration-200;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+        @apply bg-gray-100 dark:bg-zinc-900;
+    }
+    ::-webkit-scrollbar-thumb {
+        @apply bg-gray-300 dark:bg-zinc-700 rounded-full;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+        @apply bg-gray-400 dark:bg-zinc-600;
+    }
+
+    /* Focus ring polish */
+    *:focus-visible {
+        @apply outline-none ring-2 ring-indigo-500 ring-offset-2 ring-offset-white dark:ring-offset-zinc-900;
+    }
+}
+
+/* ============================================================
+   Reusable Component Utilities
+   ============================================================ */
+@layer components {
+    /* Card */
+    .card {
+        @apply bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-2xl shadow-sm;
+    }
+
+    /* Page Section Heading */
+    .section-title {
+        @apply text-lg font-semibold text-gray-900 dark:text-zinc-100;
+    }
+
+    /* Badge variants */
+    .badge {
+        @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+    }
+    .badge-green  { @apply badge bg-green-100  text-green-800  dark:bg-green-900/30  dark:text-green-300; }
+    .badge-red    { @apply badge bg-red-100    text-red-800    dark:bg-red-900/30    dark:text-red-300; }
+    .badge-yellow { @apply badge bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300; }
+    .badge-blue   { @apply badge bg-blue-100   text-blue-800   dark:bg-blue-900/30   dark:text-blue-300; }
+    .badge-gray   { @apply badge bg-gray-100   text-gray-600   dark:bg-zinc-700      dark:text-zinc-300; }
+
+    /* Button Base */
+    .btn {
+        @apply inline-flex items-center justify-center px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
+    }
+
+    /* Button Sizes */
+    .btn-sm {
+        @apply px-3 py-1.5 text-xs;
+    }
+    .btn-lg {
+        @apply px-6 py-3 text-base;
+    }
+
+    /* Button Variants */
+    .btn-primary {
+        @apply bg-gradient-to-r from-indigo-600 to-indigo-700 text-white hover:from-indigo-700 hover:to-indigo-800 focus:ring-indigo-500 shadow-sm hover:shadow-md;
+    }
+
+    .btn-secondary {
+        @apply bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700 focus:ring-gray-500 border border-gray-200 dark:border-zinc-700;
+    }
+
+    .btn-danger {
+        @apply bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 shadow-sm hover:shadow-md;
+    }
+
+    .btn-success {
+        @apply bg-green-600 text-white hover:bg-green-700 focus:ring-green-500 shadow-sm hover:shadow-md;
+    }
+
+    .btn-warning {
+        @apply bg-yellow-500 text-white hover:bg-yellow-600 focus:ring-yellow-500 shadow-sm hover:shadow-md;
+    }
+
+    /* Icon Buttons */
+    .btn-icon {
+        @apply p-2 rounded-lg transition-all duration-200 hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-200;
+    }
+
+    /* Action Button Group */
+    .action-btn {
+        @apply inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg transition-all duration-200 border;
+    }
+
+    .action-btn-view {
+        @apply action-btn bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100 hover:border-blue-300 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-800 dark:hover:bg-blue-900/30;
+    }
+
+    .action-btn-edit {
+        @apply action-btn bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100 hover:border-amber-300 dark:bg-amber-900/20 dark:text-amber-300 dark:border-amber-800 dark:hover:bg-amber-900/30;
+    }
+
+    .action-btn-delete {
+        @apply action-btn bg-red-50 text-red-700 border-red-200 hover:bg-red-100 hover:border-red-300 dark:bg-red-900/20 dark:text-red-300 dark:border-red-800 dark:hover:bg-red-900/30;
+    }
+}
