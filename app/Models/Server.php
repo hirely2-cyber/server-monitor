@@ -77,7 +77,25 @@ class Server extends Model
 
     public function isOnline(): bool
     {
-        return $this->status === 'online';
+        // Check if server has sent data in the last 5 minutes
+        if ($this->last_seen_at) {
+            return $this->last_seen_at->diffInMinutes(now()) < 5;
+        }
+        return false;
+    }
+
+    // Dynamic status based on last_seen_at
+    public function getStatusAttribute($value)
+    {
+        // If last_seen_at is within 5 minutes, consider online
+        if ($this->attributes['last_seen_at'] ?? null) {
+            $lastSeen = \Carbon\Carbon::parse($this->attributes['last_seen_at']);
+            if ($lastSeen->diffInMinutes(now()) < 5) {
+                return 'online';
+            }
+        }
+        // Otherwise, check database value or default to offline
+        return $value ?: 'offline';
     }
 
     public function getUptimePercentageAttribute(): float

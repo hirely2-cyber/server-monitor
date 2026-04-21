@@ -54,9 +54,10 @@ class MetricsController extends Controller
             'recorded_at' => now(),
         ]);
 
-        // Update server last_seen_at
+        // Update server last_seen_at and set status to online
         $server->update([
             'last_seen_at' => now(),
+            'status' => 'online',
         ]);
 
         // Dispatch job to process metrics and create alerts
@@ -81,9 +82,10 @@ class MetricsController extends Controller
             ], 401);
         }
 
-        // Update last_seen_at
+        // Update last_seen_at and set status to online
         $server->update([
             'last_seen_at' => now(),
+            'status' => 'online',
         ]);
 
         return response()->json([
