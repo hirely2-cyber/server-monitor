@@ -90,6 +90,8 @@
                 <table class="w-full">
                     <thead>
                         <tr class="border-b-2 border-gray-200 dark:border-zinc-700">
+                            <th class="text-center py-4 px-3 text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-zinc-400 w-16">No</th>
+                            <th class="text-left py-4 px-4 text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-zinc-400">Hostname</th>
                             <th class="text-left py-4 px-4 text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-zinc-400">Server</th>
                             <th class="text-left py-4 px-4 text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-zinc-400">Location</th>
                             <th class="text-left py-4 px-4 text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-zinc-400">Status</th>
@@ -101,6 +103,15 @@
                     <tbody class="divide-y divide-gray-100 dark:divide-zinc-800">
                         @forelse($servers as $server)
                         <tr class="hover:bg-gray-50 dark:hover:bg-zinc-900/50 transition-colors duration-150">
+                            <!-- No -->
+                            <td class="py-4 px-3 text-center">
+                                <span class="text-sm font-semibold text-gray-700 dark:text-zinc-300">{{ $loop->iteration + ($servers->currentPage() - 1) * $servers->perPage() }}</span>
+                            </td>
+                            <!-- Hostname -->
+                            <td class="py-4 px-4">
+                                <p class="text-sm font-mono text-gray-900 dark:text-zinc-100 font-medium">{{ $server->hostname ?? '-' }}</p>
+                            </td>
+                            <!-- Server Name & IP -->
                             <td class="py-4 px-4">
                                 <div class="flex items-center gap-3">
                                     <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-semibold text-sm flex-shrink-0">
