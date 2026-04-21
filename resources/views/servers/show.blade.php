@@ -132,24 +132,29 @@
             <!-- SSH Access -->
             @if($server->ssh_username)
             <div class="card p-6">
-                <h3 class="section-title mb-4">🔐 SSH Access</h3>
-                <div class="space-y-4">
+                <h3 class="section-title mb-6">🔐 SSH Access</h3>
+                <div class="space-y-5">
                     <!-- SSH Command -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-900 dark:text-zinc-100 mb-2">
-                            SSH Command
-                        </label>
+                    <div class="bg-gray-50 dark:bg-zinc-800/50 rounded-lg p-4 border border-gray-200 dark:border-zinc-700/50">
+                        <div class="flex items-center gap-2 mb-3">
+                            <svg class="w-4 h-4 text-gray-500 dark:text-zinc-400" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 7.5l3 2.25-3 2.25m4.5 0h3m-9 8.25h13.5A2.25 2.25 0 0021 18V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v12a2.25 2.25 0 002.25 2.25z" />
+                            </svg>
+                            <label class="text-xs font-semibold text-gray-600 dark:text-zinc-300 uppercase tracking-wide">
+                                SSH Command
+                            </label>
+                        </div>
                         <div class="flex gap-2">
                             <input 
                                 type="text" 
                                 value="{{ $server->getSshCommand() }}"
                                 readonly
-                                class="flex-1 px-4 py-2 bg-gray-50 dark:bg-zinc-900 border border-gray-300 dark:border-zinc-700 rounded-lg font-mono text-sm text-gray-900 dark:text-zinc-100"
+                                class="flex-1 px-3 py-2 bg-white dark:bg-zinc-900 border border-gray-300 dark:border-zinc-600 rounded-lg font-mono text-sm text-gray-900 dark:text-zinc-100 focus:outline-none"
                                 id="sshCommand"
                             >
                             <button 
                                 onclick="copyToClipboard('sshCommand', 'SSH command copied!')"
-                                class="btn btn-sm btn-secondary">
+                                class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 flex items-center gap-2">
                                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184" />
                                 </svg>
@@ -159,74 +164,94 @@
 
                     <div class="grid grid-cols-2 gap-4">
                         <!-- Username -->
-                        <div>
-                            <p class="text-sm text-gray-500 dark:text-zinc-400 mb-1">Username</p>
+                        <div class="bg-gray-50 dark:bg-zinc-800/50 rounded-lg p-4 border border-gray-200 dark:border-zinc-700/50">
+                            <div class="flex items-center gap-2 mb-2">
+                                <svg class="w-3.5 h-3.5 text-gray-500 dark:text-zinc-400" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                                </svg>
+                                <p class="text-xs font-semibold text-gray-600 dark:text-zinc-300 uppercase tracking-wide">Username</p>
+                            </div>
                             <p class="text-sm font-medium text-gray-900 dark:text-zinc-100 font-mono">{{ $server->ssh_username }}</p>
                         </div>
 
                         <!-- Port -->
-                        <div>
-                            <p class="text-sm text-gray-500 dark:text-zinc-400 mb-1">Port</p>
+                        <div class="bg-gray-50 dark:bg-zinc-800/50 rounded-lg p-4 border border-gray-200 dark:border-zinc-700/50">
+                            <div class="flex items-center gap-2 mb-2">
+                                <svg class="w-3.5 h-3.5 text-gray-500 dark:text-zinc-400" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 002.25-2.25V6a2.25 2.25 0 00-2.25-2.25H6A2.25 2.25 0 003.75 6v2.25A2.25 2.25 0 006 10.5zm0 9.75h2.25A2.25 2.25 0 0010.5 18v-2.25a2.25 2.25 0 00-2.25-2.25H6a2.25 2.25 0 00-2.25 2.25V18A2.25 2.25 0 006 20.25zm9.75-9.75H18a2.25 2.25 0 002.25-2.25V6A2.25 2.25 0 0018 3.75h-2.25A2.25 2.25 0 0013.5 6v2.25a2.25 2.25 0 002.25 2.25z" />
+                                </svg>
+                                <p class="text-xs font-semibold text-gray-600 dark:text-zinc-300 uppercase tracking-wide">Port</p>
+                            </div>
                             <p class="text-sm font-medium text-gray-900 dark:text-zinc-100 font-mono">{{ $server->ssh_port ?? 22 }}</p>
                         </div>
-
-                        <!-- Password -->
-                        @if($server->ssh_password)
-                        <div class="col-span-2" x-data="{ showPassword: false }">
-                            <p class="text-sm text-gray-500 dark:text-zinc-400 mb-1">Password</p>
-                            <div class="flex gap-2">
-                                <input 
-                                    :type="showPassword ? 'text' : 'password'" 
-                                    value="{{ $server->ssh_password }}"
-                                    readonly
-                                    class="flex-1 px-3 py-1.5 bg-gray-50 dark:bg-zinc-900 border border-gray-300 dark:border-zinc-700 rounded text-sm font-mono text-gray-900 dark:text-zinc-100"
-                                    id="sshPassword"
-                                >
-                                <button 
-                                    type="button"
-                                    @click="showPassword = !showPassword"
-                                    class="px-3 py-1.5 text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-100 border border-gray-300 dark:border-zinc-700 rounded">
-                                    <svg x-show="!showPassword" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/>
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                    </svg>
-                                    <svg x-show="showPassword" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="display: none;">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88"/>
-                                    </svg>
-                                </button>
-                                <button 
-                                    onclick="copyToClipboard('sshPassword', 'SSH password copied!')"
-                                    class="px-3 py-1.5 text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-100 border border-gray-300 dark:border-zinc-700 rounded">
-                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184" />
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-                        @endif
-
-                        <!-- Private Key -->
-                        @if($server->ssh_private_key)
-                        <div class="col-span-2">
-                            <p class="text-sm text-gray-500 dark:text-zinc-400 mb-1">Private Key</p>
-                            <div class="flex gap-2">
-                                <input 
-                                    type="text" 
-                                    value="••••••••••••••••••••"
-                                    readonly
-                                    class="flex-1 px-3 py-1.5 bg-gray-50 dark:bg-zinc-900 border border-gray-300 dark:border-zinc-700 rounded text-sm font-mono text-gray-900 dark:text-zinc-100"
-                                >
-                                <button 
-                                    onclick="copyToClipboard('', 'Private key copied!', `{{ str_replace(["\r", "\n"], ['', '\n'], $server->ssh_private_key) }}`)"
-                                    class="px-3 py-1.5 text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-100 border border-gray-300 dark:border-zinc-700 rounded">
-                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184" />
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-                        @endif
                     </div>
+
+                    <!-- Password -->
+                    @if($server->ssh_password)
+                    <div class="bg-gray-50 dark:bg-zinc-800/50 rounded-lg p-4 border border-gray-200 dark:border-zinc-700/50" x-data="{ showPassword: false }">
+                        <div class="flex items-center gap-2 mb-3">
+                            <svg class="w-3.5 h-3.5 text-gray-500 dark:text-zinc-400" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z" />
+                            </svg>
+                            <p class="text-xs font-semibold text-gray-600 dark:text-zinc-300 uppercase tracking-wide">Password</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <input 
+                                :type="showPassword ? 'text' : 'password'" 
+                                value="{{ $server->ssh_password }}"
+                                readonly
+                                class="flex-1 px-3 py-2 bg-white dark:bg-zinc-900 border border-gray-300 dark:border-zinc-600 rounded-lg text-sm font-mono text-gray-900 dark:text-zinc-100 focus:outline-none"
+                                id="sshPassword"
+                            >
+                            <button 
+                                type="button"
+                                @click="showPassword = !showPassword"
+                                class="px-3 py-2 text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-100 hover:bg-gray-200 dark:hover:bg-zinc-700 border border-gray-300 dark:border-zinc-600 rounded-lg transition-colors duration-200">
+                                <svg x-show="!showPassword" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                </svg>
+                                <svg x-show="showPassword" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="display: none;">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88"/>
+                                </svg>
+                            </button>
+                            <button 
+                                onclick="copyToClipboard('sshPassword', 'SSH password copied!')"
+                                class="px-3 py-2 text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-100 hover:bg-gray-200 dark:hover:bg-zinc-700 border border-gray-300 dark:border-zinc-600 rounded-lg transition-colors duration-200">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    @endif
+
+                    <!-- Private Key -->
+                    @if($server->ssh_private_key)
+                    <div class="bg-gray-50 dark:bg-zinc-800/50 rounded-lg p-4 border border-gray-200 dark:border-zinc-700/50">
+                        <div class="flex items-center gap-2 mb-3">
+                            <svg class="w-3.5 h-3.5 text-gray-500 dark:text-zinc-400" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                            </svg>
+                            <p class="text-xs font-semibold text-gray-600 dark:text-zinc-300 uppercase tracking-wide">Private Key</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <input 
+                                type="text" 
+                                value="••••••••••••••••••••"
+                                readonly
+                                class="flex-1 px-3 py-2 bg-white dark:bg-zinc-900 border border-gray-300 dark:border-zinc-600 rounded-lg text-sm font-mono text-gray-900 dark:text-zinc-100 focus:outline-none"
+                            >
+                            <button 
+                                onclick="copyToClipboard('', 'Private key copied!', `{{ str_replace(["\r", "\n"], ['', '\n'], $server->ssh_private_key) }}`)"
+                                class="px-3 py-2 text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-100 hover:bg-gray-200 dark:hover:bg-zinc-700 border border-gray-300 dark:border-zinc-600 rounded-lg transition-colors duration-200">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    @endif
                 </div>
             </div>
             @endif
@@ -234,92 +259,77 @@
             <!-- Panel Access -->
             @if($server->panel_type !== 'None')
             <div class="card p-6">
-                <h3 class="section-title mb-4">🎛️ Panel Access</h3>
-                <div class="space-y-4">
+                <h3 class="section-title mb-6">🎛️ Panel Access</h3>
+                <div class="space-y-5">
                     <!-- Panel URL with Quick Access -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-900 dark:text-zinc-100 mb-2">
-                            Panel URL
-                        </label>
+                    <div class="bg-gray-50 dark:bg-zinc-800/50 rounded-lg p-4 border border-gray-200 dark:border-zinc-700/50">
+                        <div class="flex items-center gap-2 mb-3">
+                            <svg class="w-4 h-4 text-gray-500 dark:text-zinc-400" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" />
+                            </svg>
+                            <label class="text-xs font-semibold text-gray-600 dark:text-zinc-300 uppercase tracking-wide">
+                                Panel URL
+                            </label>
+                        </div>
                         <div class="flex gap-2">
                             <input 
                                 type="text" 
                                 value="{{ $server->panel_url }}"
                                 readonly
-                                class="flex-1 px-4 py-2 bg-gray-50 dark:bg-zinc-900 border border-gray-300 dark:border-zinc-700 rounded-lg text-sm text-gray-900 dark:text-zinc-100"
+                                class="flex-1 px-3 py-2 bg-white dark:bg-zinc-900 border border-gray-300 dark:border-zinc-600 rounded-lg text-sm text-gray-900 dark:text-zinc-100 focus:outline-none"
                                 id="panelUrl"
                             >
                             <a 
                                 href="{{ $server->panel_url }}" 
                                 target="_blank"
-                                class="btn btn-sm btn-primary">
-                                <svg class="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"/>
                                 </svg>
-                                Open
+                                <span class="text-sm font-medium">Open</span>
                             </a>
                         </div>
                     </div>
 
                     <div class="grid grid-cols-2 gap-4">
                         <!-- Panel Type -->
-                        <div>
-                            <p class="text-sm text-gray-500 dark:text-zinc-400 mb-1">Panel Type</p>
-                            <span class="badge badge-blue">{{ $server->panel_type }}</span>
+                        <div class="bg-gray-50 dark:bg-zinc-800/50 rounded-lg p-4 border border-gray-200 dark:border-zinc-700/50">
+                            <div class="flex items-center gap-2 mb-2">
+                                <svg class="w-3.5 h-3.5 text-gray-500 dark:text-zinc-400" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0V12a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 12V5.25" />
+                                </svg>
+                                <p class="text-xs font-semibold text-gray-600 dark:text-zinc-300 uppercase tracking-wide">Panel Type</p>
+                            </div>
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300">{{ $server->panel_type }}</span>
                         </div>
 
                         <!-- Port -->
                         @if($server->panel_port)
-                        <div>
-                            <p class="text-sm text-gray-500 dark:text-zinc-400 mb-1">Port</p>
+                        <div class="bg-gray-50 dark:bg-zinc-800/50 rounded-lg p-4 border border-gray-200 dark:border-zinc-700/50">
+                            <div class="flex items-center gap-2 mb-2">
+                                <svg class="w-3.5 h-3.5 text-gray-500 dark:text-zinc-400" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 002.25-2.25V6a2.25 2.25 0 00-2.25-2.25H6A2.25 2.25 0 003.75 6v2.25A2.25 2.25 0 006 10.5zm0 9.75h2.25A2.25 2.25 0 0010.5 18v-2.25a2.25 2.25 0 00-2.25-2.25H6a2.25 2.25 0 00-2.25 2.25V18A2.25 2.25 0 006 20.25zm9.75-9.75H18a2.25 2.25 0 002.25-2.25V6A2.25 2.25 0 0018 3.75h-2.25A2.25 2.25 0 0013.5 6v2.25a2.25 2.25 0 002.25 2.25z" />
+                                </svg>
+                                <p class="text-xs font-semibold text-gray-600 dark:text-zinc-300 uppercase tracking-wide">Port</p>
+                            </div>
                             <p class="text-sm font-medium text-gray-900 dark:text-zinc-100 font-mono">{{ $server->panel_port }}</p>
                         </div>
                         @endif
 
                         <!-- Username -->
                         @if($server->panel_username)
-                        <div>
-                            <p class="text-sm text-gray-500 dark:text-zinc-400 mb-1">Username</p>
+                        <div class="bg-gray-50 dark:bg-zinc-800/50 rounded-lg p-4 border border-gray-200 dark:border-zinc-700/50">
+                            <div class="flex items-center gap-2 mb-2">
+                                <svg class="w-3.5 h-3.5 text-gray-500 dark:text-zinc-400" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                                </svg>
+                                <p class="text-xs font-semibold text-gray-600 dark:text-zinc-300 uppercase tracking-wide">Username</p>
+                            </div>
                             <div class="flex gap-2 items-center">
                                 <p class="text-sm font-medium text-gray-900 dark:text-zinc-100 font-mono" id="panelUsername">{{ $server->panel_username }}</p>
                                 <button 
                                     onclick="copyText('{{ $server->panel_username }}', 'Panel username copied!')"
-                                    class="text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-100">
-                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184" />
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-                        @endif
-
-                        <!-- Password -->
-                        @if($server->panel_password)
-                        <div class="col-span-2" x-data="{ showPanelPass: false }">
-                            <p class="text-sm text-gray-500 dark:text-zinc-400 mb-1">Password</p>
-                            <div class="flex gap-2">
-                                <input 
-                                    :type="showPanelPass ? 'text' : 'password'" 
-                                    value="{{ $server->panel_password }}"
-                                    readonly
-                                    class="flex-1 px-3 py-1.5 bg-gray-50 dark:bg-zinc-900 border border-gray-300 dark:border-zinc-700 rounded text-sm font-mono text-gray-900 dark:text-zinc-100"
-                                    id="panelPassword"
-                                >
-                                <button 
-                                    type="button"
-                                    @click="showPanelPass = !showPanelPass"
-                                    class="px-3 py-1.5 text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-100 border border-gray-300 dark:border-zinc-700 rounded">
-                                    <svg x-show="!showPanelPass" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/>
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                    </svg>
-                                    <svg x-show="showPanelPass" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="display: none;">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88"/>
-                                    </svg>
-                                </button>
-                                <button 
-                                    onclick="copyToClipboard('panelPassword', 'Panel password copied!')"
-                                    class="px-3 py-1.5 text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-100 border border-gray-300 dark:border-zinc-700 rounded">
+                                    class="text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-100 transition-colors duration-200">
                                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184" />
                                     </svg>
@@ -328,6 +338,46 @@
                         </div>
                         @endif
                     </div>
+
+                    <!-- Password -->
+                    @if($server->panel_password)
+                    <div class="bg-gray-50 dark:bg-zinc-800/50 rounded-lg p-4 border border-gray-200 dark:border-zinc-700/50" x-data="{ showPanelPass: false }">
+                        <div class="flex items-center gap-2 mb-3">
+                            <svg class="w-3.5 h-3.5 text-gray-500 dark:text-zinc-400" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z" />
+                            </svg>
+                            <p class="text-xs font-semibold text-gray-600 dark:text-zinc-300 uppercase tracking-wide">Password</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <input 
+                                :type="showPanelPass ? 'text' : 'password'" 
+                                value="{{ $server->panel_password }}"
+                                readonly
+                                class="flex-1 px-3 py-2 bg-white dark:bg-zinc-900 border border-gray-300 dark:border-zinc-600 rounded-lg text-sm font-mono text-gray-900 dark:text-zinc-100 focus:outline-none"
+                                id="panelPassword"
+                            >
+                            <button 
+                                type="button"
+                                @click="showPanelPass = !showPanelPass"
+                                class="px-3 py-2 text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-100 hover:bg-gray-200 dark:hover:bg-zinc-700 border border-gray-300 dark:border-zinc-600 rounded-lg transition-colors duration-200">
+                                <svg x-show="!showPanelPass" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                </svg>
+                                <svg x-show="showPanelPass" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="display: none;">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88"/>
+                                </svg>
+                            </button>
+                            <button 
+                                onclick="copyToClipboard('panelPassword', 'Panel password copied!')"
+                                class="px-3 py-2 text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-100 hover:bg-gray-200 dark:hover:bg-zinc-700 border border-gray-300 dark:border-zinc-600 rounded-lg transition-colors duration-200">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    @endif
                 </div>
             </div>
             @endif
