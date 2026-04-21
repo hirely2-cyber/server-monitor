@@ -91,7 +91,6 @@
                     <thead>
                         <tr class="border-b-2 border-gray-200 dark:border-zinc-700">
                             <th class="text-center py-4 px-3 text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-zinc-400 w-16">No</th>
-                            <th class="text-left py-4 px-4 text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-zinc-400">Hostname</th>
                             <th class="text-left py-4 px-4 text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-zinc-400">Server</th>
                             <th class="text-left py-4 px-4 text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-zinc-400">Location</th>
                             <th class="text-left py-4 px-4 text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-zinc-400">Status</th>
@@ -107,11 +106,7 @@
                             <td class="py-4 px-3 text-center">
                                 <span class="text-sm font-semibold text-gray-700 dark:text-zinc-300">{{ $loop->iteration + ($servers->currentPage() - 1) * $servers->perPage() }}</span>
                             </td>
-                            <!-- Hostname -->
-                            <td class="py-4 px-4">
-                                <p class="text-sm font-mono text-gray-900 dark:text-zinc-100 font-medium">{{ $server->hostname ?? '-' }}</p>
-                            </td>
-                            <!-- Server Name & IP -->
+                            <!-- Server Name, IP & Hostname -->
                             <td class="py-4 px-4">
                                 <div class="flex items-center gap-3">
                                     <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-semibold text-sm flex-shrink-0">
@@ -120,6 +115,9 @@
                                     <div>
                                         <p class="font-semibold text-gray-900 dark:text-zinc-100">{{ $server->name }}</p>
                                         <p class="text-xs text-gray-500 dark:text-zinc-400 font-mono">{{ $server->ip_address }}</p>
+                                        @if($server->hostname)
+                                        <p class="text-xs text-gray-400 dark:text-zinc-500 mt-0.5">{{ $server->hostname }}</p>
+                                        @endif
                                     </div>
                                 </div>
                             </td>
