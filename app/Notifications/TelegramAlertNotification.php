@@ -37,6 +37,7 @@ class TelegramAlertNotification extends Notification
     public function toTelegram($notifiable): TelegramMessage
     {
         $chatId = Cache::get('settings.notifications.telegram_chat_id', config('notifications.telegram_chat_id'));
+        $alertsUrl = rtrim(config('app.url'), '/') . '/alerts';
 
         // Get severity emoji
         $emoji = $this->getSeverityEmoji($this->alert->severity ?? 'info');
@@ -45,36 +46,37 @@ class TelegramAlertNotification extends Notification
         if ($this->alertType === 'test') {
             return TelegramMessage::create()
                 ->to($chatId)
-                ->content("🔔 *Test Notification*\n\n")
+                ->content("🔔 Test Notification\n")
                 ->line("This is a test notification from Server Monitor.")
                 ->line("✅ Telegram integration is working correctly!")
+                ->line("🔗 Check Alerts: {$alertsUrl}")
                 ->line("\n_Sent at: " . now()->format('Y-m-d H:i:s') . "_");
         }
 
         // Build alert message
+        $severity = strtoupper((string) ($this->alert->severity ?? 'info'));
         $message = TelegramMessage::create()
             ->to($chatId)
-            ->content("{$emoji} *" . strtoupper($this->alert->severity) . " Alert*\n\n");
+            ->content("{$emoji} {$severity} Alert\n");
 
         // Add alert details
         $type = str_replace('_', ' ', (string) ($this->alert->type ?? 'unknown'));
         $alertMessage = (string) ($this->alert->message ?? '-');
 
-        $message->line("*Type:* " . $this->escapeTelegramMarkdown(ucfirst($type)))
-                ->line("*Message:* " . $this->escapeTelegramMarkdown($alertMessage));
+        $message->line("Type: " . ucfirst($type))
+                ->line("Message: " . $alertMessage);
 
         // Add resource information if available
         if ($this->alert->alertable) {
             $resourceType = class_basename($this->alert->alertable_type);
             $resourceName = $this->alert->alertable->name ?? $this->alert->alertable->url ?? 'Unknown';
-            $message->line("*Resource:* "
-                . $this->escapeTelegramMarkdown($resourceType)
-                . " - "
-                . $this->escapeTelegramMarkdown((string) $resourceName));
+            $message->line("Resource: {$resourceType} - {$resourceName}");
         }
 
+        $message->line("Check Alerts: {$alertsUrl}");
+
         // Add timestamp
-        $message->line("\n_Created: " . $this->alert->created_at->format('Y-m-d H:i:s') . "_");
+        $message->line("Created: " . $this->alert->created_at->format('Y-m-d H:i:s'));
 
         return $message;
     }
@@ -90,17 +92,6 @@ class TelegramAlertNotification extends Notification
             'info' => 'ℹ️',
             default => '🔔',
         };
-    }
-
-    /**
-     * Escape characters interpreted by Telegram Markdown parser.
-     */
-    private function escapeTelegramMarkdown(string $text): string
-    {
-        $search = ['\\', '_', '*', '[', ']', '(', ')', '~', '`', '>', '#', '+', '-', '=', '|', '{', '}', '.', '!'];
-        $replace = ['\\\\', '\_', '\*', '\[', '\]', '\(', '\)', '\~', '\`', '\>', '\#', '\+', '\-', '\=', '\|', '\{', '\}', '\.', '\!'];
-
-        return str_replace($search, $replace, $text);
     }
 
     /**
