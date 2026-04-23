@@ -25,6 +25,9 @@ class NotificationService
             throw new \Exception('Telegram bot token or chat ID is not configured');
         }
 
+        // Ensure Telegram channel uses latest token from settings cache.
+        config(['services.telegram-bot-api.token' => $botToken]);
+
         // Create anonymous notifiable for Telegram
         $notifiable = new AnonymousNotifiable();
         $notifiable->route('telegram', $chatId);

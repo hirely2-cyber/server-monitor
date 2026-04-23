@@ -5,7 +5,6 @@ namespace App\Notifications;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Cache;
-use NotificationChannels\Telegram\TelegramChannel;
 use NotificationChannels\Telegram\TelegramMessage;
 
 class TelegramAlertNotification extends Notification
@@ -29,7 +28,7 @@ class TelegramAlertNotification extends Notification
      */
     public function via($notifiable): array
     {
-        return [TelegramChannel::class];
+        return ['telegram'];
     }
 
     /**
