@@ -22,21 +22,21 @@ class SettingsController extends Controller
         // Get current settings from cache/config
         $settings = [
             'monitoring' => [
-                'check_interval' => config('monitoring.check_interval', 5),
-                'alert_threshold_cpu' => config('monitoring.alert_threshold_cpu', 80),
-                'alert_threshold_memory' => config('monitoring.alert_threshold_memory', 85),
-                'alert_threshold_disk' => config('monitoring.alert_threshold_disk', 90),
-                'website_timeout' => config('monitoring.website_timeout', 10),
-                'retention_days' => config('monitoring.retention_days', 30),
+                'check_interval' => $this->getSettingValue('monitoring.check_interval', 5),
+                'alert_threshold_cpu' => $this->getSettingValue('monitoring.alert_threshold_cpu', 80),
+                'alert_threshold_memory' => $this->getSettingValue('monitoring.alert_threshold_memory', 85),
+                'alert_threshold_disk' => $this->getSettingValue('monitoring.alert_threshold_disk', 90),
+                'website_timeout' => $this->getSettingValue('monitoring.website_timeout', 10),
+                'retention_days' => $this->getSettingValue('monitoring.retention_days', 30),
             ],
             'notifications' => [
-                'email_enabled' => config('notifications.email_enabled', false),
-                'email_recipients' => config('notifications.email_recipients', ''),
-                'slack_enabled' => config('notifications.slack_enabled', false),
-                'slack_webhook' => config('notifications.slack_webhook', ''),
-                'telegram_enabled' => config('notifications.telegram_enabled', false),
-                'telegram_token' => config('notifications.telegram_token', ''),
-                'telegram_chat_id' => config('notifications.telegram_chat_id', ''),
+                'email_enabled' => $this->getSettingValue('notifications.email_enabled', false),
+                'email_recipients' => $this->getSettingValue('notifications.email_recipients', ''),
+                'slack_enabled' => $this->getSettingValue('notifications.slack_enabled', false),
+                'slack_webhook' => $this->getSettingValue('notifications.slack_webhook', ''),
+                'telegram_enabled' => $this->getSettingValue('notifications.telegram_enabled', false),
+                'telegram_token' => $this->getSettingValue('notifications.telegram_bot_token', ''),
+                'telegram_chat_id' => $this->getSettingValue('notifications.telegram_chat_id', ''),
             ],
             'system' => [
                 'app_name' => config('app.name'),
@@ -81,13 +81,104 @@ class SettingsController extends Controller
             'notifications.telegram_chat_id' => 'nullable|string',
         ]);
 
-        // Save settings to cache (in production, you'd save to database or .env)
-        foreach ($validated as $key => $value) {
-            Cache::forever("settings.{$key}", $value);
+        // Ensure unchecked toggles are saved as false.
+        $validated['notifications']['email_enabled'] = $request->boolean('notifications.email_enabled');
+        $validated['notifications']['slack_enabled'] = $request->boolean('notifications.slack_enabled');
+        $validated['notifications']['telegram_enabled'] = $request->boolean('notifications.telegram_enabled');
+
+        // Save settings to cache (in production, you'd save to database or .env).
+        foreach ($validated as $group => $values) {
+            foreach ($values as $key => $value) {
+                $settingKey = "{$group}.{$key}";
+                if ($settingKey === 'notifications.telegram_token') {
+                    $settingKey = 'notifications.telegram_bot_token';
+                }
+
+                Cache::forever("settings.{$settingKey}", $value);
+            }
         }
+
+        // Invalidate expensive settings page metrics so they can refresh once.
+        Cache::forget('settings.system_info.database_size');
+        Cache::forget('settings.system_info.cache_size');
+        Cache::forget('settings.system_info.storage_used');
 
         return redirect()->route('settings')
             ->with('success', 'Settings updated successfully.');
+    }
+
+    private function getSettingValue(string $settingKey, mixed $default): mixed
+    {
+        $configFallback = match ($settingKey) {
+            'notifications.telegram_bot_token' => config('notifications.telegram_bot_token', $default),
+            'notifications.telegram_chat_id' => config('notifications.telegram_chat_id', $default),
+            'notifications.telegram_enabled' => config('notifications.telegram_enabled', $default),
+            'notifications.email_enabled' => config('notifications.email_enabled', $default),
+            'notifications.email_recipients' => config('notifications.email_recipients', $default),
+            'notifications.slack_enabled' => config('notifications.slack_enabled', $default),
+            'notifications.slack_webhook' => config('notifications.slack_webhook', $default),
+            default => config($settingKey, $default),
+        };
+
+        return Cache::get("settings.{$settingKey}", $configFallback);
+    }
+
+    /**
+     * Get database size
+     */
+    private function getDatabaseSize()
+    {
+        return Cache::remember('settings.system_info.database_size', now()->addMinutes(5), function () {
+            try {
+                $database = config('database.connections.mysql.database');
+                $size = DB::selectOne("
+                    SELECT 
+                        ROUND(SUM(data_length + index_length) / 1024 / 1024, 2) AS size_mb
+                    FROM information_schema.tables 
+                    WHERE table_schema = ?
+                ", [$database]);
+
+                return $size->size_mb ?? 0;
+            } catch (\Exception $e) {
+                return 0;
+            }
+        });
+    }
+
+    /**
+     * Get cache size
+     */
+    private function getCacheSize()
+    {
+        return Cache::remember('settings.system_info.cache_size', now()->addMinutes(5), function () {
+            try {
+                // Keep this lightweight; avoid full cache scans in request cycle.
+                return 0;
+            } catch (\Exception $e) {
+                return 0;
+            }
+        });
+    }
+
+    /**
+     * Get storage used
+     */
+    private function getStorageUsed()
+    {
+        return Cache::remember('settings.system_info.storage_used', now()->addMinutes(5), function () {
+            try {
+                $path = storage_path();
+                $size = 0;
+
+                foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($path)) as $file) {
+                    $size += $file->getSize();
+                }
+
+                return round($size / 1024 / 1024, 2);
+            } catch (\Exception $e) {
+                return 0;
+            }
+        });
     }
 
     public function clearCache()
@@ -172,55 +263,4 @@ class SettingsController extends Controller
         }
     }
 
-    /**
-     * Get database size
-     */
-    private function getDatabaseSize()
-    {
-        try {
-            $database = config('database.connections.mysql.database');
-            $size = DB::selectOne("
-                SELECT 
-                    ROUND(SUM(data_length + index_length) / 1024 / 1024, 2) AS size_mb
-                FROM information_schema.tables 
-                WHERE table_schema = ?
-            ", [$database]);
-
-            return $size->size_mb ?? 0;
-        } catch (\Exception $e) {
-            return 0;
-        }
-    }
-
-    /**
-     * Get cache size
-     */
-    private function getCacheSize()
-    {
-        try {
-            // Estimate cache size (simplified)
-            return round(strlen(serialize(Cache::get('*'))) / 1024 / 1024, 2);
-        } catch (\Exception $e) {
-            return 0;
-        }
-    }
-
-    /**
-     * Get storage used
-     */
-    private function getStorageUsed()
-    {
-        try {
-            $path = storage_path();
-            $size = 0;
-
-            foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($path)) as $file) {
-                $size += $file->getSize();
-            }
-
-            return round($size / 1024 / 1024, 2);
-        } catch (\Exception $e) {
-            return 0;
-        }
-    }
 }

@@ -69,6 +69,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/alerts/{id}/resolve', [AlertController::class, 'resolve'])->name('alerts.resolve');
     Route::post('/alerts/resolve-multiple', [AlertController::class, 'resolveMultiple'])->name('alerts.resolve-multiple');
     Route::delete('/alerts/delete-resolved', [AlertController::class, 'deleteResolved'])->name('alerts.delete-resolved');
+    Route::delete('/alerts/delete-all-history', [AlertController::class, 'deleteAllHistory'])->name('alerts.delete-all-history');
     Route::get('/alerts/{id}', [AlertController::class, 'show'])->name('alerts.show');
     
     // Reports

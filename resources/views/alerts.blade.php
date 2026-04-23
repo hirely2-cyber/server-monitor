@@ -15,6 +15,14 @@
                     </svg>
                     Delete Resolved
                 </button>
+                <button
+                    onclick="deleteAllHistory()"
+                    class="btn btn-sm btn-danger">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6h18M8 6V4a1 1 0 011-1h6a1 1 0 011 1v2m-8 0v14a1 1 0 001 1h6a1 1 0 001-1V6" />
+                    </svg>
+                    Delete All History
+                </button>
                 <a href="{{ route('monitoring') }}" class="btn btn-sm btn-primary">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
@@ -256,10 +264,15 @@
     </div>
 
     <script>
-        function resolveAlert(alertId) {
-            if (!confirm('Are you sure you want to resolve this alert?')) {
-                return;
-            }
+        async function resolveAlert(alertId) {
+            const confirmed = await window.Alpine.store('confirm').show({
+                title: 'Resolve Alert',
+                body: 'Yakin mau tandai alert ini sebagai resolved?',
+                type: 'info',
+                confirmText: 'Ya, Resolve',
+                cancelText: 'Batal'
+            });
+            if (!confirmed) return;
 
             fetch(`/alerts/${alertId}/resolve`, {
                 method: 'POST',
@@ -271,21 +284,33 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
+                    window.dispatchEvent(new CustomEvent('toast', {
+                        detail: { message: 'Alert berhasil di-resolve.', type: 'success' }
+                    }));
                     window.location.reload();
                 } else {
-                    alert('Failed to resolve alert');
+                    window.dispatchEvent(new CustomEvent('toast', {
+                        detail: { message: 'Failed to resolve alert', type: 'error' }
+                    }));
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Failed to resolve alert');
+                window.dispatchEvent(new CustomEvent('toast', {
+                    detail: { message: 'Failed to resolve alert', type: 'error' }
+                }));
             });
         }
 
-        function deleteResolved() {
-            if (!confirm('Are you sure you want to delete all resolved alerts? This action cannot be undone.')) {
-                return;
-            }
+        async function deleteResolved() {
+            const confirmed = await window.Alpine.store('confirm').show({
+                title: 'Delete Resolved Alerts',
+                body: 'Hapus semua resolved alerts? Tindakan ini tidak bisa dibatalkan.',
+                type: 'danger',
+                confirmText: 'Ya, Hapus Semua',
+                cancelText: 'Batal'
+            });
+            if (!confirmed) return;
 
             fetch('/alerts/delete-resolved', {
                 method: 'DELETE',
@@ -297,15 +322,56 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert(data.message);
+                    window.dispatchEvent(new CustomEvent('toast', {
+                        detail: { message: data.message, type: 'success' }
+                    }));
                     window.location.reload();
                 } else {
-                    alert('Failed to delete alerts');
+                    window.dispatchEvent(new CustomEvent('toast', {
+                        detail: { message: data.message || 'No resolved alerts to delete.', type: 'warning' }
+                    }));
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Failed to delete alerts');
+                window.dispatchEvent(new CustomEvent('toast', {
+                    detail: { message: 'Failed to delete alerts', type: 'error' }
+                }));
+            });
+        }
+
+        async function deleteAllHistory() {
+            const confirmed = await window.Alpine.store('confirm').show({
+                title: 'Delete All Alert History',
+                body: 'Hapus SEMUA riwayat alert (resolved + active)? Tindakan ini tidak bisa dibatalkan.',
+                type: 'danger',
+                confirmText: 'Ya, Hapus Semua',
+                cancelText: 'Batal'
+            });
+            if (!confirmed) return;
+
+            fetch('/alerts/delete-all-history', {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                window.dispatchEvent(new CustomEvent('toast', {
+                    detail: {
+                        message: data.message || 'Delete history completed.',
+                        type: data.success ? 'success' : 'warning'
+                    }
+                }));
+                window.location.reload();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                window.dispatchEvent(new CustomEvent('toast', {
+                    detail: { message: 'Failed to delete alert history', type: 'error' }
+                }));
             });
         }
     </script>

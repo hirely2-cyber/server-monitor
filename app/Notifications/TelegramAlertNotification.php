@@ -4,6 +4,7 @@ namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
+use Illuminate\Support\Facades\Cache;
 use NotificationChannels\Telegram\TelegramChannel;
 use NotificationChannels\Telegram\TelegramMessage;
 
@@ -36,13 +37,15 @@ class TelegramAlertNotification extends Notification
      */
     public function toTelegram($notifiable): TelegramMessage
     {
+        $chatId = Cache::get('settings.notifications.telegram_chat_id', config('notifications.telegram_chat_id'));
+
         // Get severity emoji
         $emoji = $this->getSeverityEmoji($this->alert->severity ?? 'info');
         
         // Format message based on alert type
         if ($this->alertType === 'test') {
             return TelegramMessage::create()
-                ->to(config('notifications.telegram_chat_id'))
+                ->to($chatId)
                 ->content("🔔 *Test Notification*\n\n")
                 ->line("This is a test notification from Server Monitor.")
                 ->line("✅ Telegram integration is working correctly!")
@@ -51,7 +54,7 @@ class TelegramAlertNotification extends Notification
 
         // Build alert message
         $message = TelegramMessage::create()
-            ->to(config('notifications.telegram_chat_id'))
+            ->to($chatId)
             ->content("{$emoji} *" . strtoupper($this->alert->severity) . " Alert*\n\n");
 
         // Add alert details

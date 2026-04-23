@@ -92,11 +92,31 @@ class AlertController extends Controller
      */
     public function deleteResolved()
     {
-        $count = Alert::where('is_resolved', true)->delete();
+        $count = Alert::where(function ($query) {
+            $query->where('is_resolved', true)
+                ->orWhereNotNull('resolved_at');
+        })->delete();
 
         return response()->json([
-            'success' => true,
-            'message' => $count . ' resolved alerts deleted',
+            'success' => $count > 0,
+            'message' => $count > 0
+                ? $count . ' resolved alerts deleted'
+                : 'No resolved alerts found to delete.',
+        ]);
+    }
+
+    /**
+     * Delete all alert history
+     */
+    public function deleteAllHistory()
+    {
+        $count = Alert::query()->delete();
+
+        return response()->json([
+            'success' => $count > 0,
+            'message' => $count > 0
+                ? $count . ' alerts deleted from history.'
+                : 'No alert history found.',
         ]);
     }
 

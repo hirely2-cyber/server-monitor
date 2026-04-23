@@ -39,17 +39,6 @@
             </div>
         </div>
 
-        @if(session('success'))
-        <div class="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
-            <div class="flex items-center gap-2">
-                <svg class="w-5 h-5 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-                <span class="text-green-800 dark:text-green-200">{{ session('success') }}</span>
-            </div>
-        </div>
-        @endif
-
         <!-- Website Info & Status -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- Website Details -->

@@ -8,28 +8,6 @@
             </div>
         </div>
 
-        @if(session('success'))
-        <div class="card p-4 border-l-4 bg-green-50 dark:bg-green-900/10 border-green-500">
-            <div class="flex items-center gap-3">
-                <svg class="w-5 h-5 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-                <p class="text-sm font-medium text-green-900 dark:text-green-100">{{ session('success') }}</p>
-            </div>
-        </div>
-        @endif
-
-        @if(session('error'))
-        <div class="card p-4 border-l-4 bg-red-50 dark:bg-red-900/10 border-red-500">
-            <div class="flex items-center gap-3">
-                <svg class="w-5 h-5 text-red-600 dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
-                </svg>
-                <p class="text-sm font-medium text-red-900 dark:text-red-100">{{ session('error') }}</p>
-            </div>
-        </div>
-        @endif
-
         <!-- System Information -->
         <div class="card p-6">
             <h3 class="section-title mb-4">System Information</h3>
@@ -76,9 +54,21 @@
         <div class="card p-6">
             <h3 class="section-title mb-4">System Actions</h3>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <form method="POST" action="{{ route('settings.clear-cache') }}">
+                <form method="POST" action="{{ route('settings.clear-cache') }}" x-data="{
+                    async confirmAction(event) {
+                        event.preventDefault();
+                        const confirmed = await $store.confirm.show({
+                            title: 'Clear Cache',
+                            body: 'Yakin mau hapus semua cache aplikasi?',
+                            type: 'warning',
+                            confirmText: 'Ya, Clear Cache',
+                            cancelText: 'Batal'
+                        });
+                        if (confirmed) event.currentTarget.form.submit();
+                    }
+                }">
                     @csrf
-                    <button type="submit" class="w-full btn btn-secondary gap-2">
+                    <button type="submit" @click="confirmAction($event)" class="w-full btn btn-secondary gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                         </svg>
@@ -86,9 +76,21 @@
                     </button>
                 </form>
 
-                <form method="POST" action="{{ route('settings.optimize') }}">
+                <form method="POST" action="{{ route('settings.optimize') }}" x-data="{
+                    async confirmAction(event) {
+                        event.preventDefault();
+                        const confirmed = await $store.confirm.show({
+                            title: 'Optimize System',
+                            body: 'Lanjutkan optimasi config, route, dan view cache?',
+                            type: 'info',
+                            confirmText: 'Ya, Optimize',
+                            cancelText: 'Batal'
+                        });
+                        if (confirmed) event.currentTarget.form.submit();
+                    }
+                }">
                     @csrf
-                    <button type="submit" class="w-full btn btn-secondary gap-2">
+                    <button type="submit" @click="confirmAction($event)" class="w-full btn btn-secondary gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                         </svg>
@@ -96,9 +98,21 @@
                     </button>
                 </form>
 
-                <form method="POST" action="{{ route('settings.cleanup') }}" onsubmit="return confirm('Are you sure you want to cleanup old data? This action cannot be undone.')">
+                <form method="POST" action="{{ route('settings.cleanup') }}" x-data="{
+                    async confirmAction(event) {
+                        event.preventDefault();
+                        const confirmed = await $store.confirm.show({
+                            title: 'Cleanup Old Data',
+                            body: 'Data lama yang terhapus tidak bisa dikembalikan. Lanjutkan?',
+                            type: 'danger',
+                            confirmText: 'Ya, Cleanup',
+                            cancelText: 'Batal'
+                        });
+                        if (confirmed) event.currentTarget.form.submit();
+                    }
+                }">
                     @csrf
-                    <button type="submit" class="w-full btn btn-danger gap-2">
+                    <button type="submit" @click="confirmAction($event)" class="w-full btn btn-danger gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                         </svg>
@@ -274,14 +288,20 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert('✓ ' + data.message);
+                    window.dispatchEvent(new CustomEvent('toast', {
+                        detail: { message: data.message, type: 'success' }
+                    }));
                 } else {
-                    alert('✕ ' + data.message);
+                    window.dispatchEvent(new CustomEvent('toast', {
+                        detail: { message: data.message, type: 'error' }
+                    }));
                 }
             })
             .catch(error => {
-                alert('✕ Error sending test notification');
                 console.error('Error:', error);
+                window.dispatchEvent(new CustomEvent('toast', {
+                    detail: { message: 'Error sending test notification', type: 'error' }
+                }));
             });
         }
     </script>

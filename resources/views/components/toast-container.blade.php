@@ -12,6 +12,15 @@
 
 @php
     $sessionToast = session('toast');
+    $fallbackToast = null;
+
+    if (!$sessionToast && session('success')) {
+        $fallbackToast = ['message' => session('success'), 'type' => 'success'];
+    } elseif (!$sessionToast && session('error')) {
+        $fallbackToast = ['message' => session('error'), 'type' => 'error'];
+    } elseif (!$sessionToast && $errors->any()) {
+        $fallbackToast = ['message' => $errors->first(), 'type' => 'error'];
+    }
 @endphp
 
 <div
@@ -89,15 +98,29 @@
 </div>
 
 {{-- Flash toast from PHP session --}}
-@if($sessionToast)
+@if($sessionToast || $fallbackToast)
 <script>
-    document.addEventListener('alpine:init', () => {
-        window.dispatchEvent(new CustomEvent('toast', {
-            detail: {
-                message: @js($sessionToast['message'] ?? ''),
-                type:    @js($sessionToast['type']    ?? 'success'),
-            }
-        }));
-    });
+    (function () {
+        const toastPayload = @js($sessionToast ?: $fallbackToast);
+        const dispatchToast = () => {
+            if (!toastPayload || !toastPayload.message) return;
+            
+            window.dispatchEvent(new CustomEvent('toast', {
+                detail: {
+                    message: toastPayload.message ?? '',
+                    type: toastPayload.type ?? 'success',
+                }
+            }));
+        };
+
+        if (window.Alpine) {
+            setTimeout(dispatchToast, 0);
+            return;
+        }
+
+        document.addEventListener('alpine:init', dispatchToast, { once: true });
+        window.addEventListener('DOMContentLoaded', () => setTimeout(dispatchToast, 0), { once: true });
+    })();
+    
 </script>
 @endif

@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Notifications\TelegramAlertNotification;
-use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Notifications\AnonymousNotifiable;
 
 class NotificationService
@@ -13,12 +13,13 @@ class NotificationService
      */
     public function sendTelegramNotification($alert, $alertType = 'alert')
     {
-        if (!config('notifications.telegram_enabled')) {
+        $telegramEnabled = Cache::get('settings.notifications.telegram_enabled', config('notifications.telegram_enabled'));
+        if (!$telegramEnabled) {
             throw new \Exception('Telegram notifications are not enabled');
         }
 
-        $botToken = config('notifications.telegram_bot_token');
-        $chatId = config('notifications.telegram_chat_id');
+        $botToken = Cache::get('settings.notifications.telegram_bot_token', config('notifications.telegram_bot_token'));
+        $chatId = Cache::get('settings.notifications.telegram_chat_id', config('notifications.telegram_chat_id'));
 
         if (empty($botToken) || empty($chatId)) {
             throw new \Exception('Telegram bot token or chat ID is not configured');

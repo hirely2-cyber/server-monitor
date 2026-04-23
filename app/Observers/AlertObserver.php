@@ -4,6 +4,7 @@ namespace App\Observers;
 
 use App\Models\Alert;
 use App\Services\NotificationService;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 class AlertObserver
@@ -28,7 +29,8 @@ class AlertObserver
         }
 
         // Send Telegram notification if enabled
-        if (config('notifications.telegram_enabled')) {
+        $telegramEnabled = Cache::get('settings.notifications.telegram_enabled', config('notifications.telegram_enabled'));
+        if ($telegramEnabled) {
             try {
                 $this->notificationService->sendTelegramNotification($alert);
                 Log::info("Telegram notification sent for alert #{$alert->id}");
