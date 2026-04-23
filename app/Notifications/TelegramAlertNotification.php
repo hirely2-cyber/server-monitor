@@ -57,14 +57,20 @@ class TelegramAlertNotification extends Notification
             ->content("{$emoji} *" . strtoupper($this->alert->severity) . " Alert*\n\n");
 
         // Add alert details
-        $message->line("*Type:* " . ucfirst($this->alert->type))
-                ->line("*Message:* " . $this->alert->message);
+        $type = str_replace('_', ' ', (string) ($this->alert->type ?? 'unknown'));
+        $alertMessage = (string) ($this->alert->message ?? '-');
+
+        $message->line("*Type:* " . $this->escapeTelegramMarkdown(ucfirst($type)))
+                ->line("*Message:* " . $this->escapeTelegramMarkdown($alertMessage));
 
         // Add resource information if available
         if ($this->alert->alertable) {
             $resourceType = class_basename($this->alert->alertable_type);
             $resourceName = $this->alert->alertable->name ?? $this->alert->alertable->url ?? 'Unknown';
-            $message->line("*Resource:* {$resourceType} - {$resourceName}");
+            $message->line("*Resource:* "
+                . $this->escapeTelegramMarkdown($resourceType)
+                . " - "
+                . $this->escapeTelegramMarkdown((string) $resourceName));
         }
 
         // Add timestamp
@@ -84,6 +90,17 @@ class TelegramAlertNotification extends Notification
             'info' => 'ℹ️',
             default => '🔔',
         };
+    }
+
+    /**
+     * Escape characters interpreted by Telegram Markdown parser.
+     */
+    private function escapeTelegramMarkdown(string $text): string
+    {
+        $search = ['\\', '_', '*', '[', ']', '(', ')', '~', '`', '>', '#', '+', '-', '=', '|', '{', '}', '.', '!'];
+        $replace = ['\\\\', '\_', '\*', '\[', '\]', '\(', '\)', '\~', '\`', '\>', '\#', '\+', '\-', '\=', '\|', '\{', '\}', '\.', '\!'];
+
+        return str_replace($search, $replace, $text);
     }
 
     /**
